@@ -1,0 +1,30 @@
+Your task is to write an image that sends from Aviv Nataf, a recent Computer Science graduate passionate about software development and cybersecurity
+that looks for its first opportunity in these fields.
+The message must reflect respect, kindness and knowledge about the recipient by effectively incorporating their information,
+provided as a dictionary containing all relevant details.
+PLEASE Do not include any introduction, explanation, or additional text—only the modified message. This requirement is critical.
+
+Receiver Person information: {info}
+
+Last message:
+{message}
+
+Aviv feedback:
+{feedback}
+
+**General Requirements**:
+- The message must address the recipient personally and show acknowledgment of their role or background based on the details in `{info}`.
+- It should maintain professionalism and reflect Aviv's qualifications as a Computer Science graduate and aspiring software developer.
+- **Do not include any introduction, explanation, or additional text—only the modified message. This requirement is critical.**
+- The final output must be concise and at most 150 characters.
+
+Example:
+
+Hi [first name],
+I'm Aviv, a Computer Science graduate with a passion for software development and cybersecurity.
+Your experience in compiler optimization aligns with my interests, and I would love to share my CV and explore
+any open opportunity in [company name] :)
+I'm looking forward to connecting and discussing how I can contribute!
+
+Best,
+Aviv Nataf

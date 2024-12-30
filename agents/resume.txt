@@ -1,0 +1,68 @@
+Aviv Nataf - Aspiring Software Developer
+
+**Summary:**
+An aspiring software developer with **2 years of hands-on experience** in Python, Java, and full-stack development. Skilled in AI-driven solutions, cybersecurity, and software automation. Passionate about building innovative solutions and contributing to impactful projects in AI and software engineering.
+
+**Contact Information:**
+- Email: nataf12386@gmail.com
+- Phone: 0522464648
+- GitHub: https://github.com/an1604
+- LinkedIn: https://linkedin.com/in/aviv-nataf-757aa1247
+
+**Skills:**
+- **Programming Languages:** 2 years' experience in Python, Java, C, C++, JavaScript, Visual Basic
+- **Web Technologies:** 2 years' experience in HTML, CSS, JavaScript, jQuery, Node.js, Flask
+- **Databases:** 2 years' experience in MongoDB, SQL, Redis
+- **Tools and Platforms:** 2 years' experience in Linux, Kali Linux, Docker
+- **DevSecOps & Automation:** 2 years' experience with CI/CD pipelines, Git Actions workflows, Docker
+- **Data Science & AI:** 2 years' experience in Data Mining, Machine Learning, Deep Learning, PyTorch, Hugging Face
+- **Version Control:** 2 years' experience with Git, GitHub, GitLab
+
+**Education:**
+- Bachelor of Science in Computer Science (2022-2025)
+  The College of Management - Rishon LeZion
+
+**Work Experience:**
+1. **Computer Programming Instructor | Sunspark College** (2022-2024)
+   - Designed and delivered curriculum on computer and network systems.
+   - Taught programming languages (VB, Python, Java) and mentored students in coding projects.
+
+2. **Intern | Colman Dev Club Collaboration** (2022-2023)
+   - Contributed to front-end development with JavaScript and React.
+   - Implemented dynamic features to enhance user experience.
+
+**Projects:**
+1. **Deceptify | Final Project**
+   - An AI-driven project for social engineering attacks using generative AI.
+   - Technologies: Python, Flask, PyTorch, Hugging Face
+   - Achievements: Built a real-time attack simulation system integrating Zoom and Telegram with voice clone models.
+
+2. **Market Ordering Assistance**
+   - A social media platform for AI-assisted market orders.
+   - Technologies: Python, Flask, SQL, Redis
+   - Achievements: Solely developed a system that personalizes the user experience with AI.
+
+3. **JavaFX Book Scrabble Game**
+   - An interactive online multiplayer Scrabble game.
+   - Achievements: Implemented real-time gameplay over the internet.
+
+**Certifications:**
+- Deep Learning - Udemy
+- Machine Learning - Udemy
+- Cybersecurity & Ethical Hacking - Udemy
+- OWASP Top 10 WebGoat Assignments Completion
+
+**Languages:**
+- English (Fluent)
+- Hebrew (Proficient)
+
+**Accomplishments:**
+- **Oracle & Colman Hackathon:** Achieved third place for applying big data solutions to agricultural challenges.
+- **ANAC 2024 Competition:** Researched and implemented negotiation strategies in multi-agent systems.
+
+**DevOps Final Project:**
+- Containerized applications with Docker Compose, including a secure reverse proxy.
+- Configured AWS EC2 infrastructure with Ansible playbooks.
+- Automated CI/CD with GitHub workflows, including code scans and Docker deployment.
+- Conducted testing with Selenium for end-to-end and performance assessments.
+- Successfully deployed a secure production-ready application on AWS EC2.

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Companies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible column widths */
+            gap: 20px; /* Space between grid items */
+            margin-top: 20px;
+        }
+
+        .job-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .job-card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .job-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .job-card a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .job-card a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 10px;
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="job-grid">
+    {% for company in companies %}
+    <div class="job-card">
+        <form action="/get_connections" method="POST" onsubmit="handleFormSubmit(event, this)"
+              style="display: inline; margin: 0; padding: 0;">
+            <input type="hidden" name="company_name" value="{{ company.company_name }}">
+            <button type="submit" class="btn-link"
+                    style="background: none; border: none; color: white; text-decoration: underline; cursor: pointer; padding: 0; font: inherit;">
+                {{ company.company_name }}
+            </button>
+        </form>
+
+
+        <p><strong>Description:</strong> {{ company.company_desc }}</p>
+        <p><strong>Links:</strong></p>
+        <ul>
+            {% for source_name, url in company.company_links.items() %}
+            <li style="display: flex; align-items: center; justify-content: space-between;">
+                <a href="{{ url }}" target="_blank">{{ source_name }}</a>
+                <button class="btn-link" onclick="triggerPost('{{ company.company_name }}', 10)"
+                        style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer; padding: 0;">
+                    Get Connections
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+
+
+</div>
+
+<script>
+
+    function handleFormSubmit(event, formElement) {
+        // Prevent the form from being submitted immediately
+        event.preventDefault();
+
+        // Prompt the user for the number of connections
+        const maxConnections = prompt("How many connections do you want to collect?");
+
+        // Ensure the user entered a value
+        if (maxConnections !== null && maxConnections !== "") {
+            // Create a hidden input field for max_connections
+            const maxConnectionsInput = document.createElement("input");
+            maxConnectionsInput.type = "hidden";
+            maxConnectionsInput.name = "max_connections";
+            maxConnectionsInput.value = maxConnections;
+
+            // Append the hidden input to the form
+            formElement.appendChild(maxConnectionsInput);
+
+            // Submit the form
+            formElement.submit();
+        }
+    }
+
+    function triggerPost(companyName, maxConnections) {
+        fetch('/get_connections', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                user_input: companyName,
+                max_connections: maxConnections,
+            })
+        })
+            .then(response => {
+                if (response.redirected) {
+                    // Redirect the browser to the new page
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Request failed with status ' + response.status);
+                }
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending request for ' + companyName);
+            });
+    }
+
+</script>
+
+</body>
+</html>

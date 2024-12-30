@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connections Cards</title>
+    <style>
+        .job-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .job-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .job-card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .job-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .job-card a {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .job-card a:hover {
+            text-decoration: underline;
+        }
+
+        .job-actions {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        h1, h2 {
+            color: #151313;
+        }
+
+        /* Initially hide collapsible content */
+        .collapsible-content {
+            display: none;
+        }
+
+        .toggle-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .toggle-button:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+{% if connections %}
+<div class="job-list">
+    {% for connection in connections %}
+    <div class="job-card">
+        <p><strong>User Name:</strong> {{ connection.user_name }}</p>
+        <button class="toggle-button" onclick="toggleContent(this)">&#x25BC;</button>
+        <div class="collapsible-content">
+            <p><strong>Description:</strong> {{ connection.user_description }}</p>
+            <p><strong>Suggested message to send:</strong> {{ connection.suggested_message }}</p>
+        </div>
+        <p><a href="{{ connection.link_to_profile }}" target="_blank">See profile</a></p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No potential connections found.</p>
+{% endif %}
+
+<script>
+    function toggleContent(button) {
+        // Get the collapsible content div
+        const content = button.nextElementSibling;
+
+        // Toggle the visibility of the content
+        if (content.style.display === "none" || content.style.display === "") {
+            content.style.display = "block";
+            button.innerHTML = "&#x25B2;"; // Change arrow to up
+        } else {
+            content.style.display = "none";
+            button.innerHTML = "&#x25BC;"; // Change arrow to down
+        }
+    }
+</script>
+</body>
+</html>

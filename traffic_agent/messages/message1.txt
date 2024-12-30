@@ -1,0 +1,5 @@
+Hi {name},
+I'm Aviv, a Computer Science graduate passionate about software development, cybersecurity, and AI. I'd love to share my CV and explore opportunities at {company}. Looking forward to connecting and discussing how I can contribute to your team.
+
+Best,
+Aviv

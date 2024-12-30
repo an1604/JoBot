@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  jobot:
+    # Build your Flask application from the current context
+    build:
+      context: .
+    working_dir: /agents
+    volumes:
+      - .:/agents  # Mount application code for development
+    networks:
+      - joBot-network
+    ports:
+      - "5002:5002"  # Expose Flask app on port 5002
+    environment:
+      - FLASK_APP=agents/Server/app.py
+      - FLASK_ENV=production
+    depends_on:
+      - mongo  # Ensure MongoDB starts before the Flask app
+
+  mongo:
+    build:
+      context: ./db  # Use a custom Dockerfile for MongoDB in ./db
+    networks:
+      - joBot-network
+    ports:
+      - "27017:27017"  # Expose MongoDB on the default port
+    volumes:
+      - ./data:/data/db  # Persist MongoDB data locally
+
+networks:
+  joBot-network:
+    driver: bridge

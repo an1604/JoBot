@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Cards</title>
+    <style>
+        .job-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .job-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            word-wrap: break-word; /* Ensures long words or URLs wrap */
+            overflow-wrap: break-word; /* Ensures text fits inside the card */
+        }
+
+        .job-card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .job-card p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .job-card a {
+            color: #007bff; /* Matches Bootstrap primary color */
+            text-decoration: none;
+            word-break: break-word; /* Ensures long URLs wrap */
+        }
+
+        .job-card a:hover {
+            text-decoration: underline;
+        }
+
+        .job-actions {
+            background-color: #f9f9f9; /* Same color as the card */
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px; /* Add some space above the buttons */
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 5px; /* Add spacing between buttons */
+        }
+
+        .btn {
+            padding: 6px 10px; /* Smaller padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9em; /* Slightly smaller font size */
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        h1, h2 {
+            color: #151313; /* Dark header color */
+        }
+    </style>
+</head>
+<body>
+{% if jobs %}
+<div class="job-list">
+    {% for job in jobs %}
+    <div class="job-card">
+        <h3>{{ job.job_title }}</h3>
+        <p><strong>Company:</strong> {{ job.company }}</p>
+        <p><strong>Location:</strong> {{ job.location }}</p>
+        <p><strong>Description:</strong> {{ job.description }}</p>
+        <p><strong>Experience:</strong> {{ job.experience }}</p>
+        <p><a href="{{ job.source }}" target="_blank">Apply Here!</a></p>
+        <div class="job-actions">
+            <form method="POST" action="{{ url_for('delete_job', job_id=job._id) }}">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            <form method="POST" action="{{ url_for('mark_pending', job_id=job._id) }}">
+                <button type="submit" class="btn btn-warning">Pending</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No jobs found.</p>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,5 @@
+Hi {name},
+As a recent Computer Science graduate with interests in software development, cybersecurity, and AI, I'd appreciate your insights on opportunities at {company}, leveraging your expertise as a [insert relevant role/field]. I'm excited to share my CV and learn more.
+
+Best regards,
+Aviv

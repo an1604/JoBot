@@ -1,0 +1,12 @@
+Dear {company_name},
+
+I am writing to express my interest in the {position_title}. I am a software developer with skills in Python, Java, and full-stack development, and I have experience working on innovative projects in AI and cybersecurity.
+
+As a Computer Programming Instructor at Sunspark College, I created and taught courses on programming and problem-solving. During my internship at Colman Dev Club, I worked on React-based projects to improve web applications.
+
+For my degree project, I developed Deceptify, which combines AI and cybersecurity using pre-trained models for social engineering scenarios. In another project, I used CI/CD pipelines, Docker, and AWS to build and deploy secure applications.
+
+I am excited to bring my skills to {company_name} and would be happy to discuss how I can contribute to your goals.
+
+Sincerely,
+Aviv Nataf

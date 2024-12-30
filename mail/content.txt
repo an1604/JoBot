@@ -1,0 +1,2 @@
+From JoBot, there are new jobs applied:
+{JSON_CONTENT}

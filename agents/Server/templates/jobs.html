@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+Jobs - JoBot
+{% endblock %}
+
+{% block page_content %}
+<div class="hero-banner">
+    <div class="overlay">
+        <h1 style="color: black;">Welcome to JoBot</h1>
+    </div>
+</div>
+
+<div class="container" style="color: black;">
+    <h2>Select a Job Platform</h2>
+    <div class="button-container">
+        <a href="{{ url_for('linkedin_jobs') }}" class="btn btn-primary">LinkedIn Jobs</a>
+        <a href="{{ url_for('nvidia_jobs') }}" class="btn btn-primary">Nvidia Jobs</a>
+        <a href="{{ url_for('drushim_jobs') }}" class="btn btn-primary">Drushim-IL Jobs</a>
+        <a href="{{ url_for('logon_jobs') }}" class="btn btn-primary">Log-on Jobs</a>
+    </div>
+    <hr>
+    <div class="job-process-container">
+        <h2>Run Job Searching Process</h2>
+        <a href="{{ url_for('jobs') }}" class="btn btn-success">Run Job Search</a>
+        {% if message %}
+        <p style="color: green;">{{ message }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

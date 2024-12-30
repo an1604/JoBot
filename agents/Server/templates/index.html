@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home - JoBot
+{% endblock %}
+
+{% block page_content %}
+<style>
+    .hero-banner {
+        text-align: center;
+        padding: 50px 20px; /* Adjusted padding for the hero section */
+        background-color: #f5f5f5; /* Light gray background */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center the content horizontally */
+    }
+
+    .hero-banner .overlay {
+        margin-bottom: 20px; /* Space between header and buttons */
+    }
+
+    .hero-banner h1 {
+        font-size: 2.5em;
+        color: #222; /* Darker text color for the main header */
+        margin-bottom: 20px; /* Space below the header */
+    }
+
+    .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px; /* Increased spacing between buttons */
+        margin-top: 20px; /* Adds space between the header and buttons */
+    }
+
+    .button-container a {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 1em;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        background-color: #007bff; /* Bootstrap primary color */
+        transition: background-color 0.3s;
+    }
+
+    .button-container a:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+</style>
+
+
+<div class="hero-banner">
+    <!-- Welcome Header -->
+<!--    <div class="overlay">-->
+<!--        <h1>Welcome to JoBot</h1>-->
+<!--    </div>-->
+<!--    <br> <br> <br> <br>-->
+
+    <!-- Links Section -->
+    <div class="button-container">
+        <a href="{{ url_for('tipalti_jobs') }}" class="btn btn-primary">Tipalti Jobs</a>
+        <a href="{{ url_for('hiring_cafe_jobs') }}" class="btn btn-primary">HiringCafe Jobs</a>
+        <a href="{{ url_for('linkedin_jobs') }}" class="btn btn-primary">LinkedIn Jobs</a>
+        <a href="{{ url_for('sdeg_jobs') }}" class="btn btn-primary">SolarEdge Jobs</a>
+        <a href="{{ url_for('msft_jobs') }}" class="btn btn-primary">Microsoft Jobs</a>
+        <a href="{{ url_for('amzn_jobs') }}" class="btn btn-primary">Amazon Jobs</a>
+        <a href="{{ url_for('nvidia_jobs') }}" class="btn btn-primary">Nvidia Jobs</a>
+    </div>
+    <br>
+    <div class="button-container">
+        <a href="{{ url_for('monday_jobs') }}" class="btn btn-primary">Monday.com Jobs</a>
+    </div>
+</div>
+
+
+{% endblock %}

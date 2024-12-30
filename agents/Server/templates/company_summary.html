@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Summary</title>
+    <style>
+        .summary-container {
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .company-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .connections {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="summary-container">
+    <h1 class="company-title">{{ company_name | capitalize }}</h1>
+    <div class="connections">
+        {% include "connection_cards.html" %}
+    </div>
+</div>
+</body>
+</html>
+{% endblock %}

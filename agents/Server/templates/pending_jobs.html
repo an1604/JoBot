@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pending Jobs - JoBot
+{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h1>Pending Jobs</h1>
+    <div class="container">
+        <h1>{{ job_title }}</h1>
+        <form action="/summarize_pending_jobs" method="POST" style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn btn-primary">Get a PDF of all jobs you apply to</button>
+        </form>
+    </div>
+
+
+    {% include "job_cards.html" %}
+    {% include "pagination.html" %}
+
+</div>
+{% endblock %}

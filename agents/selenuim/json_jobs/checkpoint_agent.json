@@ -1,0 +1,50 @@
+[
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=21612&source=3",
+        "job_title": "QA Engineer",
+        "company": "Checkpoint",
+        "description": "Key Responsibilities\nCreate virtual/physical environments to test CP products.\nDefine, document, analyze, and execute tests (Black box, White box, Systems, Integration, automation).\nCreate test plans for new features, Meet with R&D to learn new designs.",
+        "location": "Tel Aviv",
+        "experience": 2
+    },
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=21109&source=3",
+        "job_title": "QA Engineer",
+        "company": "Checkpoint",
+        "description": "Products - QA | Full Time | Job Id: 21109\nKey Responsibilities\nLearn the product functionality quickly\nAnalyze product requirements and develop test plans and test cases\nPerform both manual exploratory testing",
+        "location": "Tel Aviv/ Hybrid (Israel)",
+        "experience": 2
+    },
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=21652&source=3",
+        "job_title": "QA Network Engineer",
+        "company": "Checkpoint",
+        "description": "Test design, test plan development, and step-by-step documentation for new and existing features. Execute tests on both existing and in-development Checkpoint products and features. High orientation to details and user experience.",
+        "location": "Tel Aviv/ Hybrid (Israel)",
+        "experience": 2
+    },
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=21818&source=3",
+        "job_title": "QA Team Leader",
+        "company": "Checkpoint",
+        "description": "Provide strong leadership to the QA team, managing 9 team members and fostering a culture of collaboration, innovation, and continuous improvement.\nDevelop and implement QA strategies, policies, and procedures aligned with organizational goals and objectives.\nProvide guidance and mentorship to QA team members, helping them grow their skills and expertise in software testing and quality assurance.",
+        "location": "Israel: Tel Aviv",
+        "experience": 5
+    },
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=20366&source=3",
+        "job_title": "Network Security Engineer - Early Availability",
+        "company": "Checkpoint",
+        "description": "Key Responsibilities\nEngaging with customers worldwide to understand and address their technical requirements.\nDeploying the company's cutting-edge Beta software and hardware on customers' sites, ensuring a seamless experience prior to market release.\nCollaborating directly with development teams, QA engineers, and managers at all levels.",
+        "location": "Israel: Tel Aviv",
+        "experience": 3
+    },
+    {
+        "source": "https://careers.checkpoint.com/index.php?m=cpcareers&a=show&joborderid=21698&source=3",
+        "job_title": "Email Security Support Engineer",
+        "company": "Checkpoint",
+        "description": "Key Responsibilities\nTrack and triage customer support tickets\nInteract with customers for analysis and resolution\nTroubleshoot problems and identify solutions",
+        "location": "Tel Aviv/ Hybrid (Israel)",
+        "experience": 2
+    }
+]

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+Drushim-IL Jobs - JoBot
+{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h1>Drushim-IL Jobs</h1>
+    {% include "pagination.html" %}
+    {% include "job_manipulation.html" %}
+    {% include "job_cards.html" %}
+    {% include "pagination.html" %}
+</div>
+{% endblock %}

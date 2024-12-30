@@ -1,0 +1,6 @@
+Hi {name},
+
+As a Computer Science graduate interested in software development, I'd appreciate your insights on opportunities at {company}. I'm impressed by your expertise in [insert relevant role/field]!
+
+Best regards,
+Aviv :)

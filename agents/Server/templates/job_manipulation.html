@@ -1,0 +1,24 @@
+<div class="container" style="text-align: center;">
+    <h1>{{ job_title }}</h1>
+    <!-- Form 1 -->
+    <form action="/refresh_jobs" method="POST" style="display: inline-block; margin: 5px;">
+        <input type="hidden" name="source" value="{{ source }}">
+        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Refresh jobs</button>
+    </form>
+    <!-- Form 2 -->
+    <form action="/collect_jobs" method="POST" style="display: inline-block; margin: 5px;">
+        <input type="hidden" name="source" value="{{ source }}">
+        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Fetch new jobs</button>
+    </form>
+    <!-- Form 3 -->
+    <form action="/delete_jobs" method="POST" style="display: inline-block; margin: 5px;">
+        <input type="hidden" name="source_name" value="{{ source }}">
+        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Delete all jobs</button>
+    </form>
+    <!-- Form 4 -->
+    <form action="/summarize_jobs" method="POST" style="display: inline-block; margin: 5px;">
+        <input type="hidden" name="source" value="{{ source }}">
+        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Summarize jobs</button>
+    </form>
+
+</div>
