@@ -13,7 +13,6 @@ from selenium.common.exceptions import (
 )
 
 from agents.Server.db import job_contains_in_db, add_job_to_job_collection
-from agents.file_manager import file_manager
 from agents.job import Job
 from agents.selenuim.agents.classic_agent import Agent
 
