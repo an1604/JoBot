@@ -19,10 +19,11 @@ from dotenv import load_dotenv
 from agents.selenuim.agents.linkdien_selen_agent import Linkedin_agent
 
 from telegram_bot.Scenes.easy_apply_scene import ApplyJobsScene
+from telegram_bot.Scenes.posts_scene import PostsScene
 from telegram_bot.Scenes.process_link_scene import ProcessLinkScene
 from telegram_bot.chatbot_models import User
 from telegram_bot.Scenes.mail_scene import MailScene
-from traffic_agent.linkedin_traffic_agent import LinkedinTrafficAgent, llm
+from traffic_agent.linkedin_traffic_agent import agent, llm
 
 load_dotenv()
 
@@ -30,12 +31,8 @@ translator_en_to_iw = GoogleTranslator(source='en', target='iw')
 translator_iw_to_en = GoogleTranslator(source='iw', target='en')
 
 TOKEN = getenv("JOBOT_TOKEN")
-linkedin_crawler = LinkedinTrafficAgent()
 linkedin_agent = Linkedin_agent()
 current_company = 'microsoft'
-
-posts = False
-keyword = None
 
 users = {}
 
@@ -67,17 +64,6 @@ def handle_routes(bot_router):
     async def help_command(message: Message) -> None:
         await message.answer("/run - run the linkedin crawl.\n")
 
-    @bot_router.message(Command('keyword'))
-    async def keyword_command(message: Message, state: FSMContext):
-        global posts, keyword
-
-        user = get_or_create_user(user=message.from_user)
-        if user:
-            keyword = message.text.split('/keyword')[-1]
-            posts = True
-            await message.answer(f"Keyword {keyword} is saved!\n"
-                                 f"You can now run the crawl with /run.")
-
     @bot_router.message(Command("company_name"))
     async def company_name_command(message: Message, state: FSMContext) -> None:
         """
@@ -108,25 +94,6 @@ def handle_routes(bot_router):
         await state.clear()
 
 
-def create_dispatcher(attack_router):
-    # Event isolation is needed to correctly handle fast user responses
-    dispatcher = Dispatcher(
-        events_isolation=SimpleEventIsolation(),
-    )
-    dispatcher.include_router(attack_router)
-
-    # To use scenes, you should create a SceneRegistry and register your scenes there
-    scene_registry = SceneRegistry(dispatcher)
-    # ... and then register a scene in the registry
-    # by default, Scene will be mounted to the router that passed to the SceneRegistry,
-    # but you can specify the router explicitly using the `router` argument
-    scene_registry.add(CrawlScene)
-    scene_registry.add(MailScene)
-    scene_registry.add(ProcessLinkScene)
-    scene_registry.add(ApplyJobsScene)
-    return dispatcher
-
-
 def get_colleague(colleagues=None, current_index=0):
     return colleagues[current_index] if colleagues is not None else None
 
@@ -137,30 +104,21 @@ class CrawlScene(Scene, state="run"):
         """
         Triggered when the user enters the CrawlScene.
         """
-        global current_company, posts, keyword
+        global current_company
 
         if not step:
             data = await state.get_data()
-            if posts and keyword is not None:
-                posts_summary = linkedin_crawler.crawl_posts_by_keywords(keywords=keyword, use_tmp_user=True,
-                                                                         need_login=True,
-                                                                         get_summary=True)
-                await message.answer(f"Posts form the given keyword {keyword}: \n\n{posts_summary}")
-                keyword = None
-                posts = False
-            else:
-                company_name = current_company if current_company else data.get("company_name")
-                await message.answer(f"Searching for hiring colleagues at '{company_name}'. Please wait...")
-                colleagues = list(linkedin_crawler.get_hiring_colleagues(company_name))
-                print(f"Found {len(colleagues)} colleagues.")
-                await state.update_data(colleagues=colleagues, current_index=0)
-                await self.process_next_colleague(message, state)
+            company_name = current_company if current_company else data.get("company_name")
+            await message.answer(f"Searching for hiring colleagues at '{company_name}'. Please wait...")
+            colleagues = list(agent.get_hiring_colleagues(company_name))
+            print(f"Found {len(colleagues)} colleagues.")
+            await state.update_data(colleagues=colleagues, current_index=0)
+            await self.process_next_colleague(message, state)
 
     async def process_next_colleague(self, message: Message, state: FSMContext, from_posts=False) -> None:
         """
         Processes the next colleague by asking the user for confirmation.
         """
-        global posts
 
         current_index = None
         data = await state.get_data()
@@ -188,20 +146,14 @@ class CrawlScene(Scene, state="run"):
             return
 
         try:
-            generated_message = linkedin_crawler.generate_message(colleague)
+            generated_message = agent.generate_message(colleague)
             msg = (f"Index: {current_index if current_index else "None"}\n\n"
                    f"Colleague: {colleague.user_name}\n\n"
                    f"Details: {colleague.user_description}\n\n"
                    f"Linkedin: {colleague.link_to_profile}\n"
                    f"Message: {generated_message}\n\n"
                    "\nDo you want to send this message? Reply with 'yes' or provide feedback."
-                   "\nIn addition, you can edit the message by yourself, by typing 'edit:' before the change.") \
-                if not from_posts else (
-                f"Index: {current_index if current_index else "None"}\n\n"
-                f"Name: {posts[current_index]._name}\n\n"
-                f"Details: {posts[current_index]._content}\n\n"
-                f"Linkedin: {posts[current_index].link}\n"
-            )
+                   "\nIn addition, you can edit the message by yourself, by typing 'edit:' before the change.")
             await state.update_data(generated_message=generated_message)
             await message.answer(msg)
         except Exception as e:
@@ -222,7 +174,7 @@ class CrawlScene(Scene, state="run"):
         user_response = message.text.strip()
         if user_response.lower() == "yes":
             colleague = get_colleague(colleagues, current_index)
-            linkedin_crawler.send_message(colleague, generated_message)
+            agent.send_message(colleague, generated_message)
             await message.answer(f"Message sent to {colleague.user_name}.")
             await state.update_data(current_index=current_index + 1)
             await self.process_next_colleague(message, state)
@@ -235,14 +187,34 @@ class CrawlScene(Scene, state="run"):
                 await self.process_next_colleague(message, state)
             elif "edit" in feedback.lower():
                 changed_message = feedback.split("edit:")[-1]
-                linkedin_crawler.send_message(colleague, changed_message)
+                agent.send_message(colleague, changed_message)
                 await message.answer(f"Message sent to {colleague.user_name}.")
                 await self.process_next_colleague(message, state)
             else:
-                generated_message = linkedin_crawler.generate_message(colleague, feedback, use_llm=True)
+                generated_message = agent.generate_message(colleague, feedback, use_llm=True)
                 await state.update_data(generated_message=generated_message)
                 await message.answer(
                     f"Here is the refinement after your feedback:\n\n{generated_message}\n\n What should I do next?")
+
+
+def create_dispatcher(attack_router):
+    # Event isolation is needed to correctly handle fast user responses
+    dispatcher = Dispatcher(
+        events_isolation=SimpleEventIsolation(),
+    )
+    dispatcher.include_router(attack_router)
+
+    # To use scenes, you should create a SceneRegistry and register your scenes there
+    scene_registry = SceneRegistry(dispatcher)
+    # ... and then register a scene in the registry
+    # by default, Scene will be mounted to the router that passed to the SceneRegistry,
+    # but you can specify the router explicitly using the `router` argument
+    scene_registry.add(CrawlScene)
+    scene_registry.add(MailScene)
+    scene_registry.add(ProcessLinkScene)
+    scene_registry.add(ApplyJobsScene)
+    scene_registry.add(PostsScene)
+    return dispatcher
 
 
 class ChatBot(object):
@@ -255,11 +227,11 @@ class ChatBot(object):
         self.shutdown_event = Event()
 
     async def start(self):
-        # Add handler that initializes the scene
         self.attack_router.message.register(CrawlScene.as_handler(), Command("run"))
         self.attack_router.message.register(MailScene.as_handler(), Command("mail"))
         self.attack_router.message.register(ProcessLinkScene.as_handler(), Command("process_link"))
         self.attack_router.message.register(ApplyJobsScene.as_handler(), Command("apply"))
+        self.attack_router.message.register(PostsScene.as_handler(), Command("posts"))
         self.dispatcher = create_dispatcher(self.attack_router)
 
         self.bot = Bot(token=TOKEN)

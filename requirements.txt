@@ -32,7 +32,6 @@ blinker
 boto3
 botocore
 Brotli
-browser-use
 bs4
 cachelib
 cachetools
@@ -169,10 +168,6 @@ langgraph
 langgraph-checkpoint
 langgraph-sdk
 langsmith
-lavague-contexts-openai
-lavague-core
-lavague-drivers-selenium
-lavague-gradio
 LexiLang
 libretranslate
 libretranslatepy
@@ -291,14 +286,11 @@ python-dateutil
 python-docx
 python-dotenv
 python-iso639
-python-jobspy
 python-json-logger
 python-magic
 python-multipart
 python-oxmsg
 pytz
-pywin32
-pywinpty
 PyYAML
 pyzmq
 qdrant-client

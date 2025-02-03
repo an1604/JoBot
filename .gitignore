@@ -11,7 +11,7 @@
 /traffic_agent/connections_details/*
 /traffic_agent/messages/*
 /traffic_agent/posts/*
-
+/mail/client_secret.json
 /agents/*.pdf
 /agents/*.txt
 

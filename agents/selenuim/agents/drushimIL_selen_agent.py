@@ -1,10 +1,8 @@
 import os
-import pdb
 import time
 
 from selenium.webdriver.support import expected_conditions as EC
 
-from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from deep_translator import GoogleTranslator
@@ -17,12 +15,10 @@ import random
 from agents.job import Job
 from agents.llm import llm_with_tools, PROMPTS
 from agents.selenuim.agents.classic_agent import Agent
+from config import config
 
-from dotenv import load_dotenv
-
-load_dotenv()
-MY_MAIL = os.getenv("MY_MAIL")
-MY_PASSWORD = os.getenv("MY_PASSWORD")
+MY_MAIL = config.MY_EMAIL
+MY_PASSWORD = config.MY_PASSWORD
 
 CYBERSEC_OPP = "https://www.drushim.co.il/jobs/cat30/"
 QA_OPP = "https://www.drushim.co.il/jobs/cat24/"

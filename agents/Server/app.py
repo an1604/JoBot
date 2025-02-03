@@ -13,7 +13,7 @@ from flask_bootstrap import Bootstrap
 
 from agents.Server.db import get_db, jobs_source_dict, get_connections_from_db, \
     get_jobs_from_db
-from agents.Server.utils import clean_job_title, create_pdf, get_data
+from agents.Server.utils import clean_job_title, create_pdf, get_data, paginate, worker, connections_worker
 from agents.file_manager import file_manager
 from agents.job import Job
 from bson.objectid import ObjectId
@@ -63,7 +63,6 @@ def delete_jobs():
 @app.route('/linkedin_jobs', methods=['GET', 'POST'])
 def linkedin_jobs():
     source_ = "linkedin_jobs"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -80,7 +79,6 @@ def linkedin_jobs():
 def hiring_cafe_jobs():
     source_ = 'hiring_cafe_jobs'
     insert_jobs_from_json_updated(file_manager.get_jobs_filepath("hiring_cafe_jobs"))
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -93,7 +91,6 @@ def hiring_cafe_jobs():
 @app.route('/nvidia_jobs', methods=['GET', 'POST'])
 def nvidia_jobs():
     source_ = "nvidia_jobs"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -119,7 +116,6 @@ def tipalti_jobs():
 @app.route('/drushim_jobs', methods=['GET'])
 def drushim_jobs():
     source = "drushimIL_jobs"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -132,7 +128,6 @@ def drushim_jobs():
 @app.route('/logon_jobs', methods=['GET', 'POST'])
 def logon_jobs():
     source = "logon_jobs"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -145,7 +140,6 @@ def logon_jobs():
 @app.route('/amzn_jobs', methods=['GET'])
 def amzn_jobs():
     source_ = "amzn_agent"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -169,7 +163,6 @@ def monday_jobs():
 @app.route('/sdeg_jobs', methods=['GET'])
 def sdeg_jobs():
     source_ = "sdeg_agent"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -182,7 +175,6 @@ def sdeg_jobs():
 @app.route('/msft_jobs')
 def msft_jobs():
     source_ = "MSFT_AGENT"
-    # remove_duplications_from_db()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 13, type=int)
@@ -195,7 +187,6 @@ def msft_jobs():
 def delete_job(job_id):
     # Delete the job from the database
     try:
-        pdb.set_trace()
         jobs_collection = get_db()['jobs_collection']
         result = jobs_collection.delete_one({"_id": ObjectId(job_id)})
         if result.deleted_count == 1:
@@ -239,16 +230,15 @@ def mark_pending(job_id):
 @app.route('/pending_jobs', methods=['GET', 'POST'])
 def pending_jobs():
     page = request.args.get('page', 1, type=int)
-    # remove_duplications_from_db("pending_jobs_collection")
 
     per_page = request.args.get('per_page', 13, type=int)
 
     pending_jobs_collection = get_db()['pending_jobs_collection']
     pagination = paginate({}, page, per_page, pending_jobs_collection)
-    pending_jobs = [Job(**job) for job in pagination["items"]]
+    _pending_jobs_ = [Job(**job) for job in pagination["items"]]
     return render_template(
         'pending_jobs.html',
-        jobs=pending_jobs,
+        jobs=_pending_jobs_,
         pagination=pagination
     )
 
@@ -369,10 +359,9 @@ def get_connections():
         company_name = request.form.get('user_input') if request.form.get('user_input') else request.form.get(
             'company_name')
         max_connections = request.form.get('max_connections')
-        connections_ = traffic_agent.search_company(company_name.lower(), int(max_connections),
-                                                    use_temp_profile=True)
-        if connections_:
-            return redirect(url_for('company_summary', company_name=company_name))
+
+        process = Process(target=connections_worker, args=(max_connections, company_name,))
+        process.start()
         return redirect(url_for(request.referrer))
     except:
         return redirect(url_for('traffic'))
@@ -387,13 +376,6 @@ def company_summary():
         for connection_data in connections_doc
     ]
     return render_template("company_summary.html", company_name=company_name, connections=connections)
-
-
-def worker(source):
-    agent = jobs_source_dict[source]()
-    jobs_collection = get_db()['jobs_collection']
-    delete_jobs_by_source(agent.name, jobs_collection)
-    agent.get_jobs()
 
 
 @app.route('/refresh_jobs', methods=['POST'])

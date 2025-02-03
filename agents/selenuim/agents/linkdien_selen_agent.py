@@ -3,6 +3,8 @@ import os
 import random
 import re
 import time
+
+from google.api_core.operations_v1.operations_client_config import config
 from langchain_community.llms import Ollama
 
 from selenium import webdriver
@@ -17,17 +19,14 @@ from agents.llm import llm_with_tools, PROMPTS
 from agents.selenuim.agents.classic_agent import Agent
 
 import requests
-from agents.file_manager import file_manager
-from dotenv import load_dotenv
-
-load_dotenv()
+from config import config
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-LINKEDIN_USERNAME = os.getenv("LINKEDIN_USERNAME")
-LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
-LINKEDIN_TEMP_USERNAME = os.getenv("LINKEDIN_TEMP_USERNAME")
-LINKEDIN_TEMP_PASSWORD = os.getenv("LINKEDIN_TEMP_PASSWORD")
+LINKEDIN_USERNAME = config.LINKEDIN_USERNAME
+LINKEDIN_PASSWORD = config.LINKEDIN_PASSWORD
+LINKEDIN_TEMP_USERNAME = config.LINKEDIN_TEMP_USERNAME
+LINKEDIN_TEMP_PASSWORD = config.LINKEDIN_TEMP_PASSWORD
 
 
 class Linkedin_agent(Agent):
@@ -137,11 +136,12 @@ class Linkedin_agent(Agent):
             except:
                 return None
 
-    def process_url(self, url, get_url=True, apply=True, pagination_xpath=None, init_driver=False):
+    def process_url(self, url, get_url=True, apply=True, pagination_xpath=None, init_driver=False,
+                    use_temp_profile=False):
         from agents.Server.db import add_job_to_job_collection
         if init_driver:
             self.initialize_driver()
-            self.login_to_linkedin(use_temp_profile=False)
+            self.login_to_linkedin(use_temp_profile=use_temp_profile)
         stop = 0
         jobs_list = {}
         if get_url:
@@ -838,4 +838,3 @@ if __name__ == '__main__':
         pass
 
     agent.get_jobs(need_login=True, use_temp_profile=False, apply=True)
-    # agent.get_external_jobs_and_auto_apply()

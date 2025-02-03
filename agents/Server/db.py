@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import pdb
 
 import pymongo
 from pymongo import MongoClient
@@ -18,7 +17,7 @@ from dotenv import load_dotenv
 
 from agents.selenuim.agents.tipalti_jobs import Tipalti_agent
 
-load_dotenv()
+from config import config
 
 # Map between the source from the POST request, to the 'FROM' value in that differentiate objects in the DB
 jobs_source_dict = {
@@ -47,8 +46,8 @@ def get_db():
     global db_dict
     if db_dict is None:
         try:
-            host = os.getenv('MONGO_HOST', 'localhost')
-            port = os.getenv('MONGO_PORT', '27017')
+            host = config.mongo_host
+            port = config.mongo_port
 
             client = MongoClient(f'mongodb://{host}:{port}/')
             db = client['job_database']
@@ -69,34 +68,6 @@ def get_db():
     else:
         return db_dict
 
-
-# def get_db():
-#     global db_dict
-#     if db_dict is None:
-#         try:
-#             host = 'localhost'
-#             client = MongoClient(f'mongodb://{host}:27017/')
-#             db = client['job_database']  # Reference the database by name
-#
-#             jobs_collection = db['jobs']
-#             job_section_collection = db['job_section']
-#             pending_jobs_collection = db['pending_jobs']
-#
-#             # Store the client, database, and collections in a dictionary
-#             db_dict = {
-#                 'client': client,
-#                 'db': db,
-#                 'jobs_collection': jobs_collection,
-#                 'job_section_collection': job_section_collection,
-#                 'pending_jobs_collection': pending_jobs_collection,
-#             }
-#             return db_dict
-#         except Exception as e:
-#             print(f"Exception occurred in get_db: {e}")
-#             db_dict = None
-#             return None
-#     else:
-#         return db_dict
 
 
 def add_jobs_from_list(jobs_list, jobs_collection):

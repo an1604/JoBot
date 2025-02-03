@@ -5,8 +5,11 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import os
 
-from agents.Server.db import get_db
+from agents.Server.db import get_db, jobs_source_dict, delete_jobs_by_source
 from agents.job import Job
+from traffic_agent.linkedin_traffic_agent import LinkedinTrafficAgent
+
+traffic_agent = LinkedinTrafficAgent()
 
 
 def clean_job_title(job_title):
@@ -119,4 +122,13 @@ def get_data(source_, page, per_page):
     return pagination, jobs_
 
 
+def worker(source):
+    agent = jobs_source_dict[source]()
+    jobs_collection = get_db()['jobs_collection']
+    delete_jobs_by_source(agent.name, jobs_collection)
+    agent.get_jobs()
 
+
+def connections_worker(max_connections, company_name):
+    connections_ = traffic_agent.search_company(company_name.lower(), int(max_connections),
+                                                use_temp_profile=True)

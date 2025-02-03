@@ -1,8 +1,7 @@
-version: '3.8'
+version: '3.9'
 
 services:
   jobot:
-    # Build your Flask application from the current context
     build:
       context: .
     working_dir: /agents
@@ -16,11 +15,20 @@ services:
       - FLASK_APP=agents/Server/app.py
       - FLASK_ENV=production
     depends_on:
-      - mongo  # Ensure MongoDB starts before the Flask app
+      - mongo
+      - selenium  # Ensure Selenium starts before Flask
+
+  selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium-server
+    networks:
+      - joBot-network
+    ports:
+      - "4444:4444"  # Expose Selenium WebDriver
+    shm_size: 2gb  # Increase shared memory for browser stability
 
   mongo:
-    build:
-      context: ./db  # Use a custom Dockerfile for MongoDB in ./db
+    image: mongo:latest  # Use official MongoDB image
     networks:
       - joBot-network
     ports:

@@ -13,6 +13,7 @@ class FileManager:
             self.server_dir = os.path.join(self.main_dir, 'Server')
 
         self.traffic_agent_dir = os.path.join(os.path.dirname(self.main_dir), 'traffic_agent')
+        self.mail_manager_dir = os.path.join(os.path.dirname(self.main_dir), 'mail')
         self.companies_dir = os.path.join(self.main_dir, 'companies')
         self.selenuim_dir = os.path.join(self.main_dir, 'selenuim')
         self.all_agents_dir = os.path.join(self.selenuim_dir, 'agents')
@@ -25,7 +26,14 @@ class FileManager:
             path = os.path.join(self.traffic_agent_dir, dirname)
             os.makedirs(path, exist_ok=True)
             return os.path.abspath(path)
-        except Exception as e:
+        except:
+            return None
+
+    def get_path_from_mail_manager(self, filename):
+        try:
+            path = os.path.join(self.mail_manager_dir, filename)
+            return os.path.abspath(path)
+        except:
             return None
 
     @staticmethod

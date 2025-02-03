@@ -10,11 +10,12 @@ from langchain_ollama import ChatOllama
 from agents.file_manager import file_manager
 
 from agents.job import Job
+from config import config
 
 
 # Tool calling to create job object in runtime
 class LLM(object):
-    def __init__(self, model_name="llama3-groq-tool-use", bind_create_job_element=True):
+    def __init__(self, model_name=config.LLM_TOOL_CALL_MODEL_NAME, bind_create_job_element=True):
         try:
             logging.info(f"Initializing LLM with tools: {model_name}")
             self.llm_with_tools = ChatOllama(model=model_name, temperature=0, format="json").bind_tools(
@@ -228,29 +229,32 @@ class PROMPTS:
     RESUME_TEXT = get_resume_path()
 
     SUMMARIZE_POST_CONTENT_TEMPLATE = """
-    Given the following post content, extract and summarize the relevant details with high accuracy and relevance. Specifically, extract:
+        Given the following post content, extract and summarize the relevant details with high accuracy and relevance. Specifically, extract:
 
-    1. The email address of the post owner (likely related to a hiring post).
-    2. The full name of the post owner.
-    3. The company name mentioned in the post content.
+        1. The email address of the post owner (likely related to a hiring post).
+        2. The full name of the post owner.
+        3. The company name mentioned in the post content.
+        4. All links present in the post content.
 
-    Post Content:
-    {content}
-    
+        Post Content:
+        {content}
 
-    Provide the output strictly in the following JSON format:
 
-    {{
-      "email": "<email_address>",
-      "name": "<post_owner_name>",
-      "company": "<company_name>",
-      "content": "<summary_of_the_post">
-    }}
+        Provide the output strictly in the following JSON format:
 
-    Ensure:
-    - No additional text, explanation, or commentary outside the JSON output.
-    - Leave fields empty ("") if the information is not present in the post content.
-    """
+        {{
+          "email": "<email_address>",
+          "name": "<post_owner_name>",
+          "company": "<company_name>",
+          "links": ["<link_1>", "<link_2>", ...],
+          "content": "<summary_of_the_post>"
+        }}
+
+        Ensure:
+        - Include all links found in the post content under the "links" key as a list. If no links are present, leave the field as an empty list ([]).
+        - No additional text, explanation, or commentary outside the JSON output.
+        - Leave other fields empty ("") if the information is not present in the post content.
+        """
 
     COMPLETE_FROM_RESUME_TEMPLATE = """
         Based on the fields in the provided JSON Schema, update the `data_to_fill` field in the following JSON document using relevant information extracted from the provided resume:

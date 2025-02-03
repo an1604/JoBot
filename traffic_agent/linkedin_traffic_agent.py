@@ -5,11 +5,12 @@ import re
 import time
 from urllib.parse import urlencode, quote
 
+from deep_translator import GoogleTranslator
+
 import agents.selenuim.agents.linkedin.linkedinFunctions as lf
 from agents.Server.db import get_db
 from langchain_community.llms import Ollama
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementClickInterceptedException, \
-    WebDriverException, ElementNotInteractableException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
@@ -20,14 +21,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 import random
 
 from agents.file_manager import file_manager
-from dotenv import load_dotenv
 
 from agents.llm import PROMPTS
 from traffic_agent.posts import Post
+from config import config
 
-load_dotenv()
-
-llm = Ollama(model="llama3.1")
+llm = Ollama(model=config.LLM_MODEL_NAME)
 
 
 class Connection:
@@ -88,7 +87,6 @@ class Connection:
         link_to_profile = connection_dict.get("link_to_profile", "#")
         user_description = connection_dict.get("user_description", "No description available.")
 
-        # Optionally handle suggested_message and company_name if required
         suggested_message = connection_dict.get("suggested_message", None) if is_suggested_message else None
         company_name = connection_dict.get("company_name", None) if is_company_name else None
         connection = Connection(name=user_name, link_to_profile=link_to_profile, user_description=user_description,
@@ -153,10 +151,6 @@ class LinkedinTrafficAgent:
         self.messages_stack = self.get_messages()
         self.prompt_for_llm = file_manager.get_prompt_filepath(filename='prompt_for_generate_message.txt')
         self.last_message_generated = 'No last message generated yet.'
-        self.LINKEDIN_USERNAME = os.getenv('LINKEDIN_USERNAME')
-        self.LINKEDIN_PASSWORD = os.getenv('LINKEDIN_PASSWORD')
-        self.LINKEDIN_TEMP_USERNAME = os.getenv('LINKEDIN_TEMP_USERNAME')
-        self.LINKEDIN_TEMP_PASSWORD = os.getenv('LINKEDIN_TEMP_PASSWORD')
 
     def login_to_linkedin(self, use_tmp_user):
         try:
@@ -218,13 +212,6 @@ class LinkedinTrafficAgent:
             try:
                 potential_connections = self.get_potential_connections(max_connections=max_connections,
                                                                        company_name=company_name)
-                try:
-                    hiring_connections = self.get_hiring_colleagues(company_name=company_name, get_page=False,
-                                                                    use_temp_profile=use_temp_profile)
-                    potential_connections.union(hiring_connections)
-                    logging.info("Search completed")
-                except:
-                    pass
 
                 self.companies_objs_for_connections[company_name] = (potential_connections, max_connections)
                 filename = self.get_company_filename(company_name)
@@ -251,11 +238,12 @@ class LinkedinTrafficAgent:
     def get_potential_connections(self, max_connections, company_name):
         potential_connections = {}
         try:
+            pdb.set_trace()
+
             self.get_searchbar_and_search(company_name)  # Collect the search bar, and search for the company
             time.sleep(3)
             link = self.get_see_all_link()
             self.driver.get(link)
-            potential_connections = set()
             stop = 0
             while len(potential_connections) <= max_connections and stop <= 10:
                 li_items = WebDriverWait(self.driver, 10).until(
@@ -281,13 +269,11 @@ class LinkedinTrafficAgent:
 
     @staticmethod
     def save_details(filename, connections):
-        from agents.Server.db import connection_in_db
         if isinstance(connections, dict):
             connections = list(connections.values())
 
         with open(filename, "w", encoding="utf-8") as f:
             for connection in connections:
-                # if not connection_in_db(connection.to_json()):
                 if not isinstance(connection, Connection):
                     connection = connection[-1]
                 f.write(connection.to_json() + "\n")
@@ -625,9 +611,10 @@ class LinkedinTrafficAgent:
                     logging.error(f"UnicodeDecodeError in file {file_path}: {e}")
         return list(messages)
 
-    def initialize_driver(self, use_tmp_user=False):
+    def initialize_driver(self, use_tmp_user=False, need_login=True):
         self.driver = webdriver.Chrome()
-        self.login_to_linkedin(use_tmp_user)
+        if need_login:
+            self.login_to_linkedin(use_tmp_user)
 
     @staticmethod
     def make_connection():
@@ -865,10 +852,11 @@ class LinkedinTrafficAgent:
                 stop += 1
         return False
 
-    def get_user_info(self, use_tmp_user):
+    @staticmethod
+    def get_user_info(use_tmp_user):
         if use_tmp_user:
-            return self.LINKEDIN_TEMP_USERNAME, self.LINKEDIN_TEMP_PASSWORD
-        return self.LINKEDIN_USERNAME, self.LINKEDIN_PASSWORD
+            return config.LINKEDIN_TEMP_USERNAME, config.LINKEDIN_TEMP_PASSWORD
+        return config.LINKEDIN_USERNAME, config.LINKEDIN_PASSWORD
 
     @staticmethod
     def save_connections_to_db(company_name, connections_):
@@ -1060,13 +1048,10 @@ class LinkedinTrafficAgent:
                     if "Feed post" in li.text:
                         try:
                             # pdb.set_trace()
-
                             link = li.find_element(By.TAG_NAME, "a").get_attribute("href")
-                            prompt = PROMPTS.SUMMARIZE_POST_CONTENT_TEMPLATE.format(content=li.text)
-                            llm_res = json.loads(llm.invoke(prompt))
-                            llm_res['link'] = link
-                            post = Post.from_dict(llm_res)
-                            posts_content.add(post)
+                            post = self.create_post_obj(text=li.text, links=link)
+                            if post:
+                                posts_content.add(post)
                             print(f"post: {post.to_dict()} in set, total size: {len(posts_content)}")
                         except:
                             continue
@@ -1111,15 +1096,123 @@ class LinkedinTrafficAgent:
             else:
                 return data
 
+    def crawl_posts_from_group(self, url="https://www.linkedin.com/groups/8879236/", need_login=True,
+                               use_temp_user=True, get_summary=False):
+        if need_login:
+            self.initialize_driver(use_tmp_user=use_temp_user)
+        self.driver.get(url)
+        time.sleep(2)
 
+        last_len = 0
+        posts = []
+        max_iterations = 15
+        iterations = 0
+
+        POSTS_XPATH = "//div[contains(@class, 'AgVfPiNz')]"
+        show_more_btn_xpath = "//button[contains(@class, 'artdeco-button')]"
+
+        while iterations < max_iterations:
+            iterations += 1
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)
+            posts = self.driver.find_elements(By.XPATH, POSTS_XPATH)
+
+            if len(posts) == last_len:
+                if not self.load_more_posts(xpath=show_more_btn_xpath):
+                    break
+            last_len = len(posts)
+        print(f"Total posts collected: {len(posts)}")
+
+        posts_objs = []
+        for post in posts:
+            text = post.text
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", post)
+            links = self.get_links_from_post(post)
+            post_obj = self.create_post_obj(text=text, links=links)
+            if post_obj:
+                posts_objs.append(post_obj)
+
+        posts_dirpath = file_manager.get_path_from_traffic_agent(dirname="posts")
+        file_path = os.path.join(posts_dirpath, "posts_from_group.json")
+        self.write_objects_to_file(objects=posts_objs, is_more_hiring=False, file_path=file_path)
+        if get_summary:
+            posts_dict = [json.dumps(post.to_dict()) for post in posts_objs]
+            return llm.invoke(
+                PROMPTS.SUMMARIZE_POSTS_TEMPLATE.format(posts=posts_dict))
+        return posts_objs
+
+    @staticmethod
+    def create_post_obj(text, links=None):
+        try:
+            translator = GoogleTranslator(source='iw', target='en')
+            if len(text.split()) > 2:
+                prompt = PROMPTS.SUMMARIZE_POST_CONTENT_TEMPLATE.format(
+                    content=translator.translate(text))
+                json_res = llm.invoke(prompt)
+                llm_res = json.loads(json_res)
+                if links is not None and len(links) > 0:
+                    llm_res['link'] = links
+                post = Post.from_dict(llm_res)
+                return post
+            return None
+        except:
+            return None
+
+    def load_more_posts(self, xpath):
+        try:
+            show_more_btn = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", show_more_btn)
+            show_more_btn.click()
+            time.sleep(2)
+            return True
+        except Exception as e:
+            print(f"No 'Show More' button or error clicking: {e}")
+            return False
+
+    @staticmethod
+    def get_links_from_post(post):
+        links = set()
+        url_pattern = re.compile(
+            r"(https?://[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|co|il)\b)"
+        )
+
+        # 1. Extract links from post-text
+        for match in url_pattern.findall(post.text):
+            links.add(match)
+
+        # 2. Extract links from <span> elements
+        spans = post.find_elements(By.TAG_NAME, 'span')
+        for span in spans:
+            span_text = span.text.strip()
+            if span_text and url_pattern.search(span_text):
+                links.add(span_text)
+
+        # 3. Extract links from <article> within the parent <div>
+        try:
+            parent_div = post.find_element(By.XPATH, "./ancestor::div[1]")
+            article = parent_div.find_element(By.TAG_NAME, "article")
+            for a in article.find_elements(By.TAG_NAME, "a"):
+                href = a.get_attribute('href')
+                if href:
+                    links.add(href)
+        except:
+            pass
+
+        # 4. Extract direct <a> tags from the post
+        try:
+            for a in post.find_elements(By.TAG_NAME, "a"):
+                href = a.get_attribute("href")
+                if href:
+                    links.add(href)
+        except:
+            pass
+
+        return list(links)
+
+
+agent = LinkedinTrafficAgent()
 if __name__ == '__main__':
-    agent = LinkedinTrafficAgent()
-    # # agent.search_company("apex security", use_temp_profile=True)
-    # agent.get_hiring_colleagues(company_name="from_link_", use_temp_profile=True,
-    #                             url_from_input="https://www.linkedin.com/search/results/people/?activelyHiringForJobTitles=9&sid=%40%2C9",
-    #                             rand_hiring=True, get_page=False)
-    keywords = "מחפשים"
-    # pdb.set_trace()
-    agent.crawl_posts_by_keywords(keywords=keywords, need_login=True)
-    print("DONE")
-# nOhuboXfCHtpjqEpIIFFSBhLSVJcFieOnKE list-style-none
+    connections_ = agent.search_company("nvidia", 5,
+                                        use_temp_profile=True)
